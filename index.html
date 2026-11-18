@@ -1,0 +1,470 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#020605">
+
+<title>カイト_a1 | System Access</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --green: #00ff9c;
+    --blue: #1685ff;
+    --cyan: #00eaff;
+    --red: #ff174d;
+    --bg: #020605;
+}
+
+body {
+    background: var(--bg);
+    color: var(--green);
+    font-family: Consolas, monospace;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* BACKGROUND VIDEO */
+
+.bg-video {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    filter: brightness(.68) contrast(1.1) saturate(1.12);
+}
+
+/* TRANSPARENT OVERLAY */
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, .17);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* SCANLINES */
+
+.scanlines {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+
+    background: repeating-linear-gradient(
+        transparent 0px,
+        rgba(0,255,156,.045) 1px,
+        transparent 2px,
+        transparent 4px
+    );
+}
+
+/* STATUS */
+
+.status {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    z-index: 3;
+    font-size: 12px;
+    line-height: 2;
+    text-shadow: 0 0 8px var(--green);
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--green);
+    animation: blink 1s infinite;
+}
+
+/* MAIN CONTENT */
+
+.container {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+    text-align: center;
+    padding: 20px;
+}
+
+/* LOGO */
+
+.logo {
+    width: 145px;
+    max-height: 145px;
+    object-fit: contain;
+
+    margin-bottom: 25px;
+
+    filter:
+        drop-shadow(0 0 12px var(--blue))
+        drop-shadow(0 0 25px rgba(0,130,255,.5));
+
+    animation: logoPulse 4s infinite;
+}
+
+/* GLITCH NAME */
+
+.glitch {
+    position: relative;
+    color: white;
+
+    font-family: Arial, sans-serif;
+    font-size: clamp(38px, 8vw, 82px);
+    font-weight: 900;
+    letter-spacing: 5px;
+
+    text-shadow:
+        0 0 10px var(--blue),
+        0 0 25px rgba(0,130,255,.8);
+
+    animation: mainGlitch 4s infinite;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+
+    overflow: hidden;
+    background: transparent;
+}
+
+.glitch::before {
+    color: var(--cyan);
+    text-shadow: 3px 0 var(--cyan);
+    animation: glitchTop 2.5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+    color: var(--red);
+    text-shadow: -3px 0 var(--red);
+    animation: glitchBottom 2s infinite linear alternate-reverse;
+}
+
+/* TERMINAL */
+
+.terminal {
+    margin-top: 35px;
+    width: min(440px, 90vw);
+
+    border: 1px solid rgba(0,255,156,.65);
+
+    background: rgba(0,10,7,.57);
+    backdrop-filter: blur(3px);
+
+    padding: 18px;
+    text-align: left;
+
+    box-shadow:
+        0 0 20px rgba(0,255,156,.12),
+        inset 0 0 20px rgba(0,255,156,.035);
+
+    font-size: 12px;
+    line-height: 2;
+}
+
+.terminal-title {
+    color: white;
+    border-bottom: 1px solid #18553e;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.green {
+    color: var(--green);
+}
+
+.blue {
+    color: var(--blue);
+}
+
+.cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: var(--green);
+    vertical-align: middle;
+    animation: blink .8s infinite;
+}
+
+/* FOOTER */
+
+.footer {
+    position: absolute;
+    z-index: 3;
+    bottom: 20px;
+    width: 100%;
+
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #75bd9f;
+
+    text-shadow: 0 0 10px var(--green);
+}
+
+/* ANIMATIONS */
+
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+@keyframes logoPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 12px var(--blue));
+    }
+    50% {
+        filter:
+            drop-shadow(0 0 22px var(--blue))
+            drop-shadow(0 0 35px rgba(0,255,255,.3));
+    }
+}
+
+@keyframes mainGlitch {
+    0%, 90%, 100% {
+        transform: translate(0);
+    }
+    91% {
+        transform: translate(-3px, 2px);
+    }
+    92% {
+        transform: translate(4px, -2px);
+    }
+    93% {
+        transform: translate(-2px, 0);
+    }
+    94% {
+        transform: translate(0);
+    }
+}
+
+@keyframes glitchTop {
+    0%, 88%, 100% {
+        clip-path: inset(0 0 85% 0);
+        transform: translate(0);
+    }
+    90% {
+        clip-path: inset(15% 0 65% 0);
+        transform: translate(-6px, -2px);
+    }
+    92% {
+        clip-path: inset(40% 0 45% 0);
+        transform: translate(5px, 1px);
+    }
+    94% {
+        clip-path: inset(5% 0 80% 0);
+        transform: translate(-3px, 0);
+    }
+    96% {
+        clip-path: inset(0 0 85% 0);
+        transform: translate(0);
+    }
+}
+
+@keyframes glitchBottom {
+    0%, 86%, 100% {
+        clip-path: inset(85% 0 0 0);
+        transform: translate(0);
+    }
+    88% {
+        clip-path: inset(65% 0 15% 0);
+        transform: translate(6px, 2px);
+    }
+    90% {
+        clip-path: inset(45% 0 35% 0);
+        transform: translate(-5px, -1px);
+    }
+    92% {
+        clip-path: inset(80% 0 5% 0);
+        transform: translate(3px, 0);
+    }
+    94% {
+        clip-path: inset(85% 0 0 0);
+        transform: translate(0);
+    }
+}
+
+/* MOBILE */
+
+@media(max-width:600px) {
+    .status {
+        font-size: 10px;
+        top: 15px;
+        left: 15px;
+    }
+
+    .logo {
+        width: 115px;
+    }
+
+    .glitch {
+        letter-spacing: 2px;
+    }
+
+    .terminal {
+        font-size: 11px;
+        margin-top: 25px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND VIDEO -->
+
+<video
+    id="bgVideo"
+    class="bg-video"
+    autoplay
+    loop
+    playsinline
+    preload="auto">
+
+    <source src="video.mp4" type="video/mp4">
+
+</video>
+
+<div class="overlay"></div>
+<div class="scanlines"></div>
+
+<!-- SYSTEM STATUS -->
+
+<div class="status">
+
+    <span class="dot"></span>
+    SYSTEM ONLINE<br>
+
+    ENCRYPTION: ACTIVE<br>
+
+    ID: KAITO_A1
+
+</div>
+
+<!-- MAIN -->
+
+<main class="container">
+
+    <img
+        src="logo.png"
+        class="logo"
+        alt="Kaito Logo">
+
+    <h1
+        class="glitch"
+        data-text="カイト_a1">
+
+        カイト_a1
+
+    </h1>
+
+    <div class="terminal">
+
+        <div class="terminal-title">
+            [ SYSTEM TERMINAL ]
+        </div>
+
+        <div>
+            <span class="green">root@kaito</span>:~#
+            Initializing system...
+        </div>
+
+        <div class="blue">
+            Loading personal identity...
+        </div>
+
+        <div class="green">
+            Identity verified.
+        </div>
+
+        <div>
+            Access status:
+            <span class="green">GRANTED</span>
+        </div>
+
+        <div>
+            <span class="green">root@kaito</span>:~#
+            <span class="cursor"></span>
+        </div>
+
+    </div>
+
+</main>
+
+<footer class="footer">
+    KAITO_A1 • DIGITAL IDENTITY
+</footer>
+
+<!-- AUTOMATIC VIDEO + AUDIO -->
+
+<script>
+
+const video = document.getElementById("bgVideo");
+
+async function startVideo() {
+
+    video.volume = 1;
+    video.muted = false;
+
+    try {
+
+        await video.play();
+
+        console.log("KAITO VIDEO AND AUDIO STARTED");
+
+    } catch (error) {
+
+        console.warn("Browser blocked autoplay with sound:", error);
+
+        // Fallback: play video silently
+        video.muted = true;
+
+        try {
+            await video.play();
+        } catch (videoError) {
+            console.error("Video playback failed:", videoError);
+        }
+
+    }
+}
+
+if (document.readyState === "loading") {
+
+    document.addEventListener("DOMContentLoaded", startVideo);
+
+} else {
+
+    startVideo();
+
+}
+
+</script>
+
+</body>
+</html>
