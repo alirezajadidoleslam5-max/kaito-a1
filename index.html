@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>カイト_a1 | System Access</title>
+<title>Kaito_a1 | System Access</title>
 
 <style>
 * {
@@ -35,14 +35,14 @@ body {
     height: 100%;
     object-fit: cover;
     z-index: 0;
-    filter: brightness(.48) contrast(1.12);
+    filter: brightness(.42) contrast(1.1);
 }
 
 /* Overlay */
 .overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, .30);
+    background: rgba(0, 0, 0, .33);
     z-index: 1;
 }
 
@@ -60,26 +60,6 @@ body {
     );
 }
 
-.status {
-    position: absolute;
-    top: 25px;
-    left: 25px;
-    z-index: 3;
-    font-size: 12px;
-    line-height: 2;
-    text-shadow: 0 0 8px var(--green);
-}
-
-.dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    background: var(--green);
-    border-radius: 50%;
-    box-shadow: 0 0 10px var(--green);
-    animation: blink 1s infinite;
-}
-
 .container {
     position: relative;
     z-index: 2;
@@ -92,12 +72,31 @@ body {
     padding: 20px;
 }
 
+.status {
+    position: absolute;
+    z-index: 3;
+    top: 25px;
+    left: 25px;
+    font-size: 12px;
+    line-height: 2;
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 10px var(--green);
+    animation: blink 1s infinite;
+}
+
 .logo {
     width: 145px;
     max-height: 145px;
     object-fit: contain;
-    margin-bottom: 25px;
     filter: drop-shadow(0 0 18px var(--blue));
+    margin-bottom: 25px;
 }
 
 h1 {
@@ -128,13 +127,8 @@ h1 {
     margin-bottom: 10px;
 }
 
-.green {
-    color: var(--green);
-}
-
-.blue {
-    color: var(--blue);
-}
+.green { color: var(--green); }
+.blue { color: var(--blue); }
 
 .cursor {
     display: inline-block;
@@ -143,6 +137,27 @@ h1 {
     background: var(--green);
     vertical-align: middle;
     animation: blink .8s infinite;
+}
+
+.controls {
+    margin-top: 25px;
+}
+
+button {
+    background: rgba(0,0,0,.5);
+    border: 1px solid var(--green);
+    color: var(--green);
+    padding: 12px 22px;
+    font-family: Consolas, monospace;
+    cursor: pointer;
+    letter-spacing: 2px;
+    transition: .3s;
+}
+
+button:hover {
+    background: var(--green);
+    color: black;
+    box-shadow: 0 0 20px var(--green);
 }
 
 .footer {
@@ -170,22 +185,15 @@ h1 {
     .status { font-size: 10px; }
     .logo { width: 115px; }
     h1 { letter-spacing: 2px; }
-    .terminal { font-size: 11px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- Background video -->
-<video
-    id="bgVideo"
-    class="bg-video"
-    autoplay
-    loop
-    playsinline
-    preload="auto"
->
+<video id="bgVideo"
+       class="bg-video"
+       autoplay muted loop playsinline>
     <source src="video.mp4" type="video/mp4">
 </video>
 
@@ -200,18 +208,17 @@ h1 {
 
 <main class="container">
 
-    <img src="logo.png" class="logo" alt="Kaito Logo">
+    <img src="logo.png" class="logo" alt="Kaito">
 
     <h1>カイト_a1</h1>
 
     <div class="terminal">
-
         <div class="terminal-title">
             [ SYSTEM TERMINAL ]
         </div>
 
         <div>
-            <span class="red">root@kaito</span>:~#
+            <span class="green">root@kaito</span>:~#
             Initializing system...
         </div>
 
@@ -232,71 +239,45 @@ h1 {
             <span class="green">root@kaito</span>:~#
             <span class="cursor"></span>
         </div>
+    </div>
 
+    <div class="controls">
+        <button id="soundBtn" onclick="toggleSound()">
+            [ ENABLE VIDEO SOUND ]
+        </button>
     </div>
 
 </main>
 
+<footer class="footer">
+    KAITO_A1 • DIGITAL IDENTITY
+</footer>
 
 <script>
-
 const video = document.getElementById("bgVideo");
+const soundBtn = document.getElementById("soundBtn");
 
-// Automatic playback attempt
-async function startVideo() {
+let soundEnabled = false;
 
-    video.volume = 1;
-    video.muted = false;
-
+async function toggleSound() {
     try {
-
-        await video.play();
-
-        console.log("KAITO VIDEO + AUDIO STARTED");
-
-    } catch (error) {
-
-        console.log("Autoplay audio blocked by browser");
-
-        // Start video without sound
-        video.muted = true;
-
-        try {
+        if (!soundEnabled) {
+            video.volume = 1;
+            video.muted = false;
             await video.play();
-        } catch (videoError) {
-            console.error("Video playback failed:", videoError);
+
+            soundEnabled = true;
+            soundBtn.textContent = "[ SOUND ON ]";
+        } else {
+            video.muted = true;
+            soundEnabled = false;
+            soundBtn.textContent = "[ ENABLE VIDEO SOUND ]";
         }
-    }
-}
-
-// Start after page loads
-window.addEventListener("load", startVideo);
-
-// Start audio after the first REAL user click
-async function activateAudio() {
-
-    video.muted = false;
-    video.volume = 1;
-
-    try {
-
-        await video.play();
-
-        console.log("KAITO AUDIO ACTIVATED");
-
-        document.removeEventListener("click", activateAudio);
-        document.removeEventListener("keydown", activateAudio);
-
     } catch (error) {
-
-        console.log("Audio could not be activated:", error);
-
+        soundBtn.textContent = "[ AUDIO ERROR ]";
+        console.error(error);
     }
 }
-
-document.addEventListener("click", activateAudio);
-document.addEventListener("keydown", activateAudio);
-
 </script>
 
 </body>
