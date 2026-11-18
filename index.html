@@ -1,0 +1,485 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#020605">
+<title>カイト_a1 | System Access</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --green: #00ff9c;
+    --blue: #1685ff;
+    --cyan: #00eaff;
+    --red: #ff174d;
+    --bg: #020605;
+}
+
+body {
+    background: var(--bg);
+    color: var(--green);
+    font-family: Consolas, monospace;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+/* BACKGROUND VIDEO */
+.bg-video {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    filter: brightness(.72) contrast(1.12) saturate(1.15);
+}
+
+/* TRANSPARENT OVERLAY */
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.20);
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* SCANLINES */
+.scanlines {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    background: repeating-linear-gradient(
+        transparent 0px,
+        rgba(0,255,156,.05) 1px,
+        transparent 2px,
+        transparent 4px
+    );
+}
+
+/* STATUS */
+.status {
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    z-index: 3;
+    font-size: 12px;
+    line-height: 2;
+    text-shadow: 0 0 8px var(--green);
+}
+
+.dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 12px var(--green);
+    animation: blink .8s infinite;
+}
+
+/* MAIN */
+.container {
+    position: relative;
+    z-index: 2;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+}
+
+/* LOGO */
+.logo {
+    width: 145px;
+    max-height: 145px;
+    object-fit: contain;
+    margin-bottom: 25px;
+    filter:
+        drop-shadow(0 0 14px var(--blue))
+        drop-shadow(0 0 25px rgba(0,130,255,.5));
+    animation: logoPulse 3s infinite;
+}
+
+/* GLITCH TITLE */
+.glitch {
+    position: relative;
+    display: inline-block;
+    color: white;
+    font-family: Arial, sans-serif;
+    font-size: clamp(38px, 8vw, 82px);
+    font-weight: 900;
+    letter-spacing: 5px;
+
+    text-shadow:
+        0 0 10px var(--blue),
+        0 0 25px rgba(0,130,255,.8);
+
+    animation: titleShake 3.5s infinite;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.glitch::before {
+    color: var(--cyan);
+    text-shadow: -3px 0 var(--cyan);
+    animation: glitchTop 1.7s infinite steps(2, end);
+}
+
+.glitch::after {
+    color: var(--red);
+    text-shadow: 3px 0 var(--red);
+    animation: glitchBottom 1.3s infinite steps(2, end);
+}
+
+/* RANDOM DIGITAL TEAR */
+.tear {
+    position: relative;
+    height: 2px;
+    width: 145px;
+    margin: 14px auto 0;
+    background: var(--green);
+    box-shadow:
+        0 0 10px var(--green),
+        30px 5px 0 var(--blue);
+    animation: tearMove 1.8s infinite;
+}
+
+/* TERMINAL */
+.terminal {
+    margin-top: 30px;
+    width: min(440px, 90vw);
+    border: 1px solid rgba(0,255,156,.65);
+    background: rgba(0,10,7,.53);
+    backdrop-filter: blur(3px);
+    padding: 18px;
+    text-align: left;
+
+    box-shadow:
+        0 0 20px rgba(0,255,156,.15),
+        inset 0 0 20px rgba(0,255,156,.04);
+
+    font-size: 12px;
+    line-height: 2;
+}
+
+.terminal-title {
+    color: white;
+    border-bottom: 1px solid #18553e;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+}
+
+.green { color: var(--green); }
+.blue { color: var(--blue); }
+
+.cursor {
+    display: inline-block;
+    width: 8px;
+    height: 15px;
+    background: var(--green);
+    vertical-align: middle;
+    animation: blink .8s infinite;
+}
+
+/* SOUND BUTTON */
+.controls {
+    margin-top: 24px;
+}
+
+.sound-btn {
+    background: rgba(0,10,7,.75);
+    border: 1px solid var(--green);
+    color: var(--green);
+    padding: 12px 23px;
+    font-family: Consolas, monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    cursor: pointer;
+    box-shadow: 0 0 12px rgba(0,255,156,.15);
+    transition: .25s;
+}
+
+.sound-btn:hover {
+    background: var(--green);
+    color: #00150c;
+    box-shadow: 0 0 25px var(--green);
+    transform: scale(1.04);
+}
+
+.sound-btn.active {
+    color: var(--cyan);
+    border-color: var(--cyan);
+    box-shadow: 0 0 18px rgba(0,234,255,.35);
+}
+
+/* FOOTER */
+.footer {
+    position: absolute;
+    z-index: 3;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: #75bd9f;
+    text-shadow: 0 0 10px var(--green);
+}
+
+/* ANIMATIONS */
+@keyframes blink {
+    50% { opacity: 0; }
+}
+
+@keyframes logoPulse {
+    0%, 100% {
+        filter: drop-shadow(0 0 12px var(--blue));
+    }
+    50% {
+        filter:
+            drop-shadow(0 0 25px var(--blue))
+            drop-shadow(0 0 35px var(--cyan));
+    }
+}
+
+@keyframes titleShake {
+    0%, 82%, 100% { transform: translate(0); }
+    84% { transform: translate(-4px, 2px) skewX(3deg); }
+    85% { transform: translate(5px, -2px) skewX(-4deg); }
+    86% { transform: translate(-3px, 1px); }
+    87% { transform: translate(0); }
+    94% { transform: translate(2px, 0); }
+    95% { transform: translate(-2px, 0); }
+    96% { transform: translate(0); }
+}
+
+@keyframes glitchTop {
+    0%, 80%, 100% {
+        clip-path: inset(0 0 90% 0);
+        transform: translate(0);
+    }
+    82% {
+        clip-path: inset(10% 0 65% 0);
+        transform: translate(-9px, -3px);
+    }
+    84% {
+        clip-path: inset(40% 0 43% 0);
+        transform: translate(8px, 1px);
+    }
+    86% {
+        clip-path: inset(5% 0 78% 0);
+        transform: translate(-5px, 2px);
+    }
+    88% {
+        clip-path: inset(25% 0 65% 0);
+        transform: translate(5px, 0);
+    }
+}
+
+@keyframes glitchBottom {
+    0%, 77%, 100% {
+        clip-path: inset(90% 0 0 0);
+        transform: translate(0);
+    }
+    79% {
+        clip-path: inset(65% 0 10% 0);
+        transform: translate(9px, 2px);
+    }
+    81% {
+        clip-path: inset(45% 0 35% 0);
+        transform: translate(-8px, -2px);
+    }
+    83% {
+        clip-path: inset(78% 0 5% 0);
+        transform: translate(5px, 0);
+    }
+    85% {
+        clip-path: inset(58% 0 15% 0);
+        transform: translate(-5px, 1px);
+    }
+}
+
+@keyframes tearMove {
+    0%, 75%, 100% {
+        transform: translateX(0) scaleX(1);
+        opacity: .8;
+    }
+    77% {
+        transform: translateX(35px) scaleX(.5);
+        opacity: 1;
+    }
+    79% {
+        transform: translateX(-25px) scaleX(1.5);
+        opacity: .4;
+    }
+    81% {
+        transform: translateX(0) scaleX(1);
+        opacity: 1;
+    }
+}
+
+/* MOBILE */
+@media(max-width:600px) {
+    .status {
+        font-size: 10px;
+        top: 15px;
+        left: 15px;
+    }
+
+    .logo {
+        width: 115px;
+    }
+
+    .glitch {
+        letter-spacing: 2px;
+    }
+
+    .terminal {
+        font-size: 11px;
+        margin-top: 25px;
+    }
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- BACKGROUND VIDEO -->
+<video id="bgVideo"
+       class="bg-video"
+       autoplay muted loop playsinline preload="auto">
+    <source src="video.mp4" type="video/mp4">
+</video>
+
+<div class="overlay"></div>
+<div class="scanlines"></div>
+
+<!-- STATUS -->
+<div class="status">
+    <span class="dot"></span> SYSTEM ONLINE<br>
+    ENCRYPTION: ACTIVE<br>
+    ID: KAITO_A1
+</div>
+
+<!-- MAIN -->
+<main class="container">
+
+    <img src="logo.png" class="logo" alt="Kaito Logo">
+
+    <h1 class="glitch" data-text="カイト_a1">
+        カイト_a1
+    </h1>
+
+    <div class="tear"></div>
+
+    <div class="terminal">
+        <div class="terminal-title">
+            [ SYSTEM TERMINAL ]
+        </div>
+
+        <div>
+            <span class="green">root@kaito</span>:~#
+            Initializing system...
+        </div>
+
+        <div class="blue">
+            Loading personal identity...
+        </div>
+
+        <div class="green">
+            Identity verified.
+        </div>
+
+        <div>
+            Access status:
+            <span class="green">GRANTED</span>
+        </div>
+
+        <div>
+            <span class="green">root@kaito</span>:~#
+            <span class="cursor"></span>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="sound-btn"
+                id="soundBtn"
+                type="button">
+            [ ENABLE VIDEO SOUND ]
+        </button>
+    </div>
+
+</main>
+
+<footer class="footer">
+    KAITO_A1 • DIGITAL IDENTITY
+</footer>
+
+<script>
+const video = document.getElementById("bgVideo");
+const soundBtn = document.getElementById("soundBtn");
+
+let soundEnabled = false;
+
+// Start background video silently
+async function startVideo() {
+    try {
+        await video.play();
+    } catch (error) {
+        console.error("Video playback error:", error);
+    }
+}
+
+// Sound button
+soundBtn.addEventListener("click", async function () {
+    try {
+        if (!soundEnabled) {
+            video.muted = false;
+            video.volume = 1;
+
+            await video.play();
+
+            soundEnabled = true;
+            soundBtn.textContent = "[ SOUND ON ]";
+            soundBtn.classList.add("active");
+
+        } else {
+            video.muted = true;
+
+            soundEnabled = false;
+            soundBtn.textContent = "[ ENABLE VIDEO SOUND ]";
+            soundBtn.classList.remove("active");
+        }
+
+    } catch (error) {
+        video.muted = true;
+        soundBtn.textContent = "[ AUDIO ERROR ]";
+        console.error("Audio activation error:", error);
+    }
+});
+
+startVideo();
+</script>
+
+</body>
+</html>
